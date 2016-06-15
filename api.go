@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GetTotalPosts -- determines the total posts on a blog
@@ -75,8 +76,8 @@ func buildPostURL(blog, key string, limit, offset int) string {
 	query.Set("api_key", key)
 	query.Set("filter", "text")
 	query.Set("reblog_info", "false")
-	query.Set("limit", string(limit))
-	query.Set("offset", string(offset))
+	query.Set("limit", strconv.Itoa(limit))
+	query.Set("offset", strconv.Itoa(offset))
 
 	u.RawQuery = query.Encode()
 

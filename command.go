@@ -10,7 +10,6 @@ import (
 type config struct {
 	Blog   string
 	APIKey string
-	Limit  int
 	Output string
 }
 
@@ -31,8 +30,7 @@ func main() {
 
 	fmt.Printf("Total posts: [%v]\n", count)
 
-	limit := 0
-	for i := 1; i < count; i += 20 {
+	for i := 1; i <= count; i += 20 {
 		fmt.Printf("Getting posts (%v-%v)\n", i, i+20)
 
 		posts, err := GetPosts(conf.Blog, conf.APIKey, 20, i)
@@ -41,13 +39,9 @@ func main() {
 			os.Exit(2)
 		}
 
-		for _, post := range *posts {
-			fmt.Printf("%+v\n", post)
-			limit++
-
-			if limit >= conf.Limit {
-				return
-			}
+		err = HandlePosts(posts, conf.Output)
+		if err != nil {
+			fmt.Printf("Error handling posts: %s", err)
 		}
 	}
 }
@@ -58,7 +52,6 @@ func parse() (*config, error) {
 	flags := flag.NewFlagSet("tumblr importer", flag.ExitOnError)
 	flags.StringVar(&c.Blog, "blog", "", "tumblr blog name without tumblr.com - blogname.tumblr.com")
 	flags.StringVar(&c.APIKey, "key", "", "API key for tumblr")
-	flags.IntVar(&c.Limit, "limit", 20, "total to retrieve")
 	flags.StringVar(&c.Output, "output", "", "output directory for the saved files")
 
 	flags.Parse(os.Args[1:])
